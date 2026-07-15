@@ -1,0 +1,116 @@
+{
+  "info": {
+    "name": "Nutrition Assistant API",
+    "description": "MERN internship project API collection. Run Login first to populate the token variable.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "token", "value": "" },
+    { "key": "clientId", "value": "" },
+    { "key": "mealPlanId", "value": "" },
+    { "key": "progressId", "value": "" }
+  ],
+  "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Health Check",
+          "auth": { "type": "noauth" },
+          "request": { "method": "GET", "url": "{{baseUrl}}/health" }
+        },
+        {
+          "name": "Register User",
+          "auth": { "type": "noauth" },
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Secure@123\",\n  \"role\": \"user\"\n}" },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "auth": { "type": "noauth" },
+          "event": [{ "listen": "test", "script": { "exec": ["const body = pm.response.json();", "if (body.token) pm.collectionVariables.set('token', body.token);"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@nutrition.local\",\n  \"password\": \"Demo@123\"\n}" },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        { "name": "My Profile", "request": { "method": "GET", "url": "{{baseUrl}}/auth/me" } }
+      ]
+    },
+    {
+      "name": "Clients",
+      "item": [
+        { "name": "List Authorized Clients", "request": { "method": "GET", "url": "{{baseUrl}}/clients" } },
+        { "name": "List Users Without Profile", "request": { "method": "GET", "url": "{{baseUrl}}/clients/unassigned-users" } },
+        { "name": "Get Client", "request": { "method": "GET", "url": "{{baseUrl}}/clients/{{clientId}}" } },
+        {
+          "name": "Create Client",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"user\": \"REPLACE_WITH_USER_ID\",\n  \"dietitian\": \"\",\n  \"dateOfBirth\": \"1998-01-15\",\n  \"gender\": \"male\",\n  \"heightCm\": 174,\n  \"currentWeightKg\": 78,\n  \"targetWeightKg\": 72,\n  \"activityLevel\": \"moderate\",\n  \"goal\": \"weight-loss\",\n  \"dailyCalorieTarget\": 2100,\n  \"dietaryPreference\": \"vegetarian\",\n  \"allergies\": [],\n  \"medicalConditions\": [],\n  \"notes\": \"Demo profile\"\n}" },
+            "url": "{{baseUrl}}/clients"
+          }
+        },
+        { "name": "Delete Client", "request": { "method": "DELETE", "url": "{{baseUrl}}/clients/{{clientId}}" } }
+      ]
+    },
+    {
+      "name": "Meal Plans",
+      "item": [
+        { "name": "List Meal Plans", "request": { "method": "GET", "url": "{{baseUrl}}/meal-plans" } },
+        { "name": "Get Meal Plan", "request": { "method": "GET", "url": "{{baseUrl}}/meal-plans/{{mealPlanId}}" } },
+        {
+          "name": "Create Meal Plan",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"client\": \"{{clientId}}\",\n  \"title\": \"Balanced Weekly Plan\",\n  \"description\": \"Demo nutrition plan\",\n  \"startDate\": \"2026-07-13\",\n  \"endDate\": \"2026-07-20\",\n  \"status\": \"active\",\n  \"meals\": [{\n    \"name\": \"Breakfast\",\n    \"time\": \"08:00\",\n    \"items\": [{ \"name\": \"Vegetable idli\", \"quantity\": \"3 pieces\", \"calories\": 270, \"protein\": 9, \"carbs\": 52, \"fat\": 3 }]\n  }]\n}" },
+            "url": "{{baseUrl}}/meal-plans"
+          }
+        },
+        { "name": "Delete Meal Plan", "request": { "method": "DELETE", "url": "{{baseUrl}}/meal-plans/{{mealPlanId}}" } }
+      ]
+    },
+    {
+      "name": "Progress",
+      "item": [
+        { "name": "List Progress", "request": { "method": "GET", "url": "{{baseUrl}}/progress?client={{clientId}}" } },
+        {
+          "name": "Create Progress Entry",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"client\": \"{{clientId}}\",\n  \"date\": \"2026-07-13\",\n  \"weightKg\": 77.5,\n  \"caloriesConsumed\": 2050,\n  \"waterLitres\": 2.5,\n  \"exerciseMinutes\": 40,\n  \"adherencePercent\": 88,\n  \"mood\": \"good\",\n  \"notes\": \"Felt energetic\"\n}" },
+            "url": "{{baseUrl}}/progress"
+          }
+        },
+        { "name": "Delete Progress Entry", "request": { "method": "DELETE", "url": "{{baseUrl}}/progress/{{progressId}}" } }
+      ]
+    },
+    {
+      "name": "Administration",
+      "item": [
+        { "name": "Dashboard", "request": { "method": "GET", "url": "{{baseUrl}}/admin/dashboard" } },
+        { "name": "List Users", "request": { "method": "GET", "url": "{{baseUrl}}/admin/users" } },
+        {
+          "name": "Approve User",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"active\" }" },
+            "url": "{{baseUrl}}/admin/users/REPLACE_WITH_USER_ID"
+          }
+        }
+      ]
+    }
+  ]
+}
